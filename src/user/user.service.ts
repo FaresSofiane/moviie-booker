@@ -1,19 +1,24 @@
-/* eslint-disable @typescript-eslint/require-await */
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
 
   async findByEmail(email: string): Promise<User | undefined> {
-    return this.users.find((user) => user.email === email);
+    const user = await this.userRepository.findOne({ where: { email } });
+    return user || undefined;
   }
 
   async findById(id: number): Promise<User | undefined> {
-    return this.users.find((user) => user.id === id);
+    const user = await this.userRepository.findOne({ where: { id } });
+    return user || undefined;
   }
 
   async create(
@@ -23,21 +28,19 @@ export class UserService {
   ): Promise<User> {
     const existingUser = await this.findByEmail(email);
     if (existingUser) {
-      throw new Error('Cet email est déjà utilisé');
+      throw new ConflictException('Cet email est déjà utilisé');
     }
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const newUser: User = {
-      id: this.idCounter++,
+    const newUser = this.userRepository.create({
       username,
       email,
       password: hashedPassword,
-    };
+    });
 
-    this.users.push(newUser);
-    return newUser;
+    return this.userRepository.save(newUser);
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
