@@ -1,47 +1,51 @@
 // src/user/user.controller.ts
 
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Request, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('utilisateurs')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  async create(
-    @Body()
-    createUserDto: {
-      username: string;
-      email: string;
-      password: string;
-    },
-  ) {
-    return this.userService.create(
-      createUserDto.username,
-      createUserDto.email,
-      createUserDto.password,
-    );
+  @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Utilisateur récupéré avec succès',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Utilisateur non trouvé',
+  })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.userService.findById(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Récupérer l utilisateur connecté' })
+  @ApiResponse({
+    status: 200,
+    description: 'Utilisateur récupéré avec succès',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Utilisateur non trouvé',
+  })
   @Get('me')
   getMe(@Request() req) {
     const { password, ...userWithoutPassword } = req.user;
     return userWithoutPassword;
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findById(+id);
-  }
 }
