@@ -13,6 +13,7 @@ async function bootstrap() {
     .setDescription('API de réservation de films')
     .setVersion('1.0')
     .addBearerAuth()
+    .addTag('films')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
