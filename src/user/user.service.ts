@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -44,17 +44,22 @@ export class UserService {
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
+    console.log('Validating user with email:', email);
     const user = await this.findByEmail(email);
 
     if (!user) {
+      console.log('User not found');
       return null;
     }
+    console.log('User found:', user);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
+      console.log('Invalid password');
       return null;
     }
+    console.log('Password valid:', isPasswordValid);
 
     return user;
   }
