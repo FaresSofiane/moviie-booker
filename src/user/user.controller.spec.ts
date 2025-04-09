@@ -8,12 +8,12 @@ describe('UserController', () => {
   let userService: UserService;
 
   const mockUserService = {
-    findOne: jest.fn(),
-    findAll: jest.fn(),
-    create: jest.fn(),
+    findById: jest.fn(),
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
@@ -33,31 +33,59 @@ describe('UserController', () => {
   });
 
   describe('findOne', () => {
-    it('should return a user by id', async () => {
-      const user = new User();
-      user.id = 1;
-      user.email = 'test@example.com';
+    it('should return a user when user exists', async () => {
+      const mockUser = {
+        id: 1,
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'hashedpassword',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as User;
 
-      jest.spyOn(userService, 'findOne').mockResolvedValue(user);
+      mockUserService.findById.mockResolvedValue(mockUser);
 
       const result = await controller.findOne('1');
-      expect(result).toEqual(user);
-      expect(userService.findOne).toHaveBeenCalledWith(1);
+
+      expect(result).toEqual(mockUser);
+      expect(userService.findById).toHaveBeenCalledWith(1);
+    });
+
+    it('should return undefined when user does not exist', async () => {
+      mockUserService.findById.mockResolvedValue(undefined);
+
+      const result = await controller.findOne('999');
+
+      expect(result).toBeUndefined();
+      expect(userService.findById).toHaveBeenCalledWith(999);
     });
   });
 
-  describe('findAll', () => {
-    it('should return an array of users', async () => {
-      const users = [
-        { id: 1, email: 'test1@example.com' },
-        { id: 2, email: 'test2@example.com' },
-      ] as User[];
+  describe('getMe', () => {
+    it('should return the authenticated user without password', async () => {
+      const mockRequest = {
+        user: {
+          id: 1,
+          username: 'testuser',
+          email: 'test@example.com',
+          password: 'hashedpassword',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      };
 
-      jest.spyOn(userService, 'findAll').mockResolvedValue(users);
+      const expectedResponse = {
+        id: 1,
+        username: 'testuser',
+        email: 'test@example.com',
+        createdAt: mockRequest.user.createdAt,
+        updatedAt: mockRequest.user.updatedAt,
+      };
 
-      const result = await controller.findAll();
-      expect(result).toEqual(users);
-      expect(userService.findAll).toHaveBeenCalled();
+      const result = controller.getMe(mockRequest);
+
+      expect(result).toEqual(expectedResponse);
+      expect(result).not.toHaveProperty('password');
     });
   });
 });

@@ -1,33 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ReservationService } from './reservation.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ReservationService } from './reservation.service';
 import { Reservation } from './entities/reservation.entity';
-import { User } from '../user/entities/user.entity';
-import { Movie } from '../movies/entities/movie.entity';
-import { UserService } from '../user/user.service';
-import { MoviesService } from '../movies/movies.service';
+import { CreateReservationDto } from './dto/create-reservation.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('ReservationService', () => {
   let service: ReservationService;
-  let reservationRepository: Repository<Reservation>;
-  let userService: UserService;
-  let moviesService: MoviesService;
+  let repository: Repository<Reservation>;
 
   const mockReservationRepository = {
     find: jest.fn(),
     findOne: jest.fn(),
-    create: jest.fn(),
     save: jest.fn(),
-  };
-
-  const mockUserService = {
-    findOne: jest.fn(),
-  };
-
-  const mockMoviesService = {
-    findOne: jest.fn(),
+    remove: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -38,138 +25,171 @@ describe('ReservationService', () => {
           provide: getRepositoryToken(Reservation),
           useValue: mockReservationRepository,
         },
-        {
-          provide: UserService,
-          useValue: mockUserService,
-        },
-        {
-          provide: MoviesService,
-          useValue: mockMoviesService,
-        },
       ],
     }).compile();
 
     service = module.get<ReservationService>(ReservationService);
-    reservationRepository = module.get<Repository<Reservation>>(getRepositoryToken(Reservation));
-    userService = module.get<UserService>(UserService);
-    moviesService = module.get<MoviesService>(MoviesService);
+    repository = module.get<Repository<Reservation>>(
+      getRepositoryToken(Reservation),
+    );
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should create a reservation successfully', async () => {
-      const createDto = {
-        userId: 1,
+  describe('creerReservation', () => {
+    it('devrait créer une réservation avec succès', async () => {
+      // Arrange
+      const userId = 1;
+      const createReservationDto: CreateReservationDto = {
         movieId: 1,
-        date: new Date(),
+        dateHeure: '2023-06-01T14:00:00',
       };
 
-      const user = { id: 1 } as User;
-      const movie = { id: 1 } as Movie;
-      const reservation = {
-        id: 1,
-        user,
-        movie,
-        date: createDto.date
-      } as Reservation;
+      const mockReservation = new Reservation();
+      mockReservation.id = 1;
+      mockReservation.movieId = createReservationDto.movieId;
+      mockReservation.dateHeure = new Date(createReservationDto.dateHeure);
+      mockReservation.userId = userId;
 
-      jest.spyOn(userService, 'findOne').mockResolvedValue(user);
-      jest.spyOn(moviesService, 'findOne').mockResolvedValue(movie);
-      jest.spyOn(reservationRepository, 'create').mockReturnValue(reservation);
-      jest.spyOn(reservationRepository, 'save').mockResolvedValue(reservation);
+      mockReservationRepository.find.mockResolvedValue([]);
+      mockReservationRepository.save.mockResolvedValue(mockReservation);
 
-      const result = await service.create(createDto);
+      // Act
+      const result = await service.creerReservation(
+        createReservationDto,
+        userId,
+      );
 
-      expect(result).toEqual(reservation);
-      expect(userService.findOne).toHaveBeenCalledWith(createDto.userId);
-      expect(moviesService.findOne).toHaveBeenCalledWith(createDto.movieId);
-      expect(reservationRepository.create).toHaveBeenCalledWith({
-        user,
-        movie,
-        date: createDto.date,
-      });
-      expect(reservationRepository.save).toHaveBeenCalledWith(reservation);
+      // Assert
+      expect(repository.find).toHaveBeenCalledWith({ where: { userId } });
+      expect(repository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          movieId: createReservationDto.movieId,
+          dateHeure: new Date(createReservationDto.dateHeure),
+          userId,
+        }),
+      );
+      expect(result).toEqual(mockReservation);
     });
 
-    it('should throw NotFoundException when user is not found', async () => {
-      const createDto = {
-        userId: 999,
+    it('devrait rejeter si userId est manquant', async () => {
+      // Arrange
+      const createReservationDto: CreateReservationDto = {
         movieId: 1,
-        date: new Date(),
+        dateHeure: '2023-06-01T14:00:00',
       };
 
-      jest.spyOn(userService, 'findOne').mockResolvedValue(null);
-
-      await expect(service.create(createDto)).rejects.toThrow(NotFoundException);
-      expect(userService.findOne).toHaveBeenCalledWith(createDto.userId);
+      // Act & Assert
+      await expect(
+        service.creerReservation(createReservationDto, 0), // Utiliser 0 au lieu de undefined
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.creerReservation(createReservationDto, 0), // Utiliser 0 au lieu de undefined
+      ).rejects.toThrow('ID utilisateur manquant');
     });
 
-    it('should throw NotFoundException when movie is not found', async () => {
-      const createDto = {
-        userId: 1,
-        movieId: 999,
-        date: new Date(),
+    it('devrait rejeter en cas de conflit de réservation', async () => {
+      // Arrange
+      const userId = 1;
+      const createReservationDto: CreateReservationDto = {
+        movieId: 1,
+        dateHeure: '2023-06-01T14:00:00',
       };
 
-      const user = { id: 1 } as User;
+      const existingReservation = new Reservation();
+      existingReservation.id = 2;
+      existingReservation.movieId = 2;
+      existingReservation.dateHeure = new Date('2023-06-01T13:30:00');
+      existingReservation.userId = userId;
 
-      jest.spyOn(userService, 'findOne').mockResolvedValue(user);
-      jest.spyOn(moviesService, 'findOne').mockResolvedValue(null);
+      mockReservationRepository.find.mockResolvedValue([existingReservation]);
 
-      await expect(service.create(createDto)).rejects.toThrow(NotFoundException);
-      expect(userService.findOne).toHaveBeenCalledWith(createDto.userId);
-      expect(moviesService.findOne).toHaveBeenCalledWith(createDto.movieId);
+      // Act & Assert
+      await expect(
+        service.creerReservation(createReservationDto, userId),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.creerReservation(createReservationDto, userId),
+      ).rejects.toThrow(
+        'Impossible de réserver pendant cette plage horaire, vous avez déjà un film programmé',
+      );
     });
   });
 
-  describe('findAll', () => {
-    it('should return all reservations', async () => {
-      const reservations = [
-        { id: 1, user: { id: 1 }, movie: { id: 1 } },
-        { id: 2, user: { id: 2 }, movie: { id: 2 } },
-      ] as Reservation[];
+  describe('getReservationsUtilisateur', () => {
+    it("devrait retourner les réservations de l'utilisateur", async () => {
+      // Arrange
+      const userId = 1;
+      const mockReservations = [
+        {
+          id: 1,
+          movieId: 1,
+          dateHeure: new Date('2023-06-01T14:00:00'),
+          userId,
+        },
+        {
+          id: 2,
+          movieId: 2,
+          dateHeure: new Date('2023-06-02T16:00:00'),
+          userId,
+        },
+      ];
 
-      jest.spyOn(reservationRepository, 'find').mockResolvedValue(reservations);
+      mockReservationRepository.find.mockResolvedValue(mockReservations);
 
-      const result = await service.findAll();
+      // Act
+      const result = await service.getReservationsUtilisateur(userId);
 
-      expect(result).toEqual(reservations);
-      expect(reservationRepository.find).toHaveBeenCalledWith({
-        relations: ['user', 'movie'],
+      // Assert
+      expect(repository.find).toHaveBeenCalledWith({
+        where: { userId },
+        order: { dateHeure: 'ASC' },
       });
+      expect(result).toEqual(mockReservations);
     });
   });
 
-  describe('findOne', () => {
-    it('should return a reservation by id', async () => {
-      const reservation = {
-        id: 1,
-        user: { id: 1 },
-        movie: { id: 1 },
-      } as Reservation;
+  describe('annulerReservation', () => {
+    it('devrait annuler une réservation avec succès', async () => {
+      // Arrange
+      const reservationId = 1;
+      const userId = 1;
 
-      jest.spyOn(reservationRepository, 'findOne').mockResolvedValue(reservation);
+      const mockReservation = new Reservation();
+      mockReservation.id = reservationId;
+      mockReservation.movieId = 1;
+      mockReservation.dateHeure = new Date('2023-06-01T14:00:00');
+      mockReservation.userId = userId;
 
-      const result = await service.findOne(1);
+      mockReservationRepository.findOne.mockResolvedValue(mockReservation);
+      mockReservationRepository.remove.mockResolvedValue(undefined);
 
-      expect(result).toEqual(reservation);
-      expect(reservationRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 1 },
-        relations: ['user', 'movie'],
+      // Act
+      await service.annulerReservation(reservationId, userId);
+
+      // Assert
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: reservationId, userId },
       });
+      expect(repository.remove).toHaveBeenCalledWith(mockReservation);
     });
 
-    it('should throw NotFoundException when reservation is not found', async () => {
-      jest.spyOn(reservationRepository, 'findOne').mockResolvedValue(null);
+    it("devrait lancer une exception si la réservation n'est pas trouvée", async () => {
+      // Arrange
+      const reservationId = 999;
+      const userId = 1;
 
-      await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-      expect(reservationRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 999 },
-        relations: ['user', 'movie'],
-      });
+      mockReservationRepository.findOne.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(
+        service.annulerReservation(reservationId, userId),
+      ).rejects.toThrow(NotFoundException);
+      await expect(
+        service.annulerReservation(reservationId, userId),
+      ).rejects.toThrow('Réservation introuvable');
     });
   });
 });

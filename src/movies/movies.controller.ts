@@ -32,26 +32,9 @@ export class MoviesController {
     status: 500,
     description: 'Erreur serveur : Impossible de récupérer les films',
   })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Numéro de page pour la pagination',
-  })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    description: 'Valeur de recherche pour filtrer les films',
-  })
-  @ApiQuery({
-    name: 'sort',
-    required: false,
-    type: String,
-    description: 'Critere de tri comme popularity.desc ou release_date.desc',
-  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @Get()
-  @ApiBody({type: MovieQueryDto})
   async getNowPlaying(
     @Query(new ValidationPipe({ transform: true })) query: MovieQueryDto,
   ): Promise<{
@@ -62,4 +45,5 @@ export class MoviesController {
   }> {
     return this.moviesService.getNowPlaying(query);
   }
+
 }
