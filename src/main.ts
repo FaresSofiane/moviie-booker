@@ -12,7 +12,17 @@ async function bootstrap() {
     .setTitle('Moviie Booker API')
     .setDescription('API de réservation de films')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Entrez votre JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
     .addTag('films')
     .build();
 
