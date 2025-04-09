@@ -1,5 +1,3 @@
-// src/auth/strategies/jwt.strategy.ts
-
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -28,8 +26,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    // Payload contient les données que nous avons incluses lors de la génération du token
-    const user = await this.userService.findById(payload.sub);
+    if (!payload.sub || isNaN(Number(payload.sub))) {
+      console.log('Invalid payload:', payload);
+      throw new UnauthorizedException(
+        'Token invalide: identifiant utilisateur manquant ou invalide',
+      );
+    }
+
+    const user = await this.userService.findById(Number(payload.sub));
 
     if (!user) {
       throw new UnauthorizedException('Utilisateur non trouvé');

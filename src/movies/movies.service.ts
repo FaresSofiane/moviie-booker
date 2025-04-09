@@ -16,26 +16,25 @@ export class MoviesService {
     const apiKey = this.configService.get<string>('TMDB_API_KEY');
 
     try {
-      // Construire l'URL pour les films à l'affiche
       let url = `${apiUrl}/movie/now_playing`;
 
-      // Préparer les paramètres de requête
-      const params: any = {
+      const params: {
+        page: number;
+        query?: string;
+        sort_by?: string;
+      } = {
         page: queryParams.page || 1,
       };
 
-      // Si un terme de recherche est fourni, on utilise l'endpoint de recherche
       if (queryParams.search) {
         url = `${apiUrl}/search/movie`;
         params.query = queryParams.search;
       }
 
-      // Ajouter le paramètre de tri si spécifié
       if (queryParams.sort) {
         params.sort_by = queryParams.sort;
       }
 
-      // Faire la requête HTTP vers l'API TMDB
       const response = await firstValueFrom(
         this.httpService.get(url, {
           headers: {

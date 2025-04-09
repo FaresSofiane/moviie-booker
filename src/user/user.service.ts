@@ -17,6 +17,9 @@ export class UserService {
   }
 
   async findById(id: number): Promise<User | undefined> {
+    if (isNaN(id)) {
+      return undefined;
+    }
     const user = await this.userRepository.findOne({ where: { id } });
     return user || undefined;
   }
