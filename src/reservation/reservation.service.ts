@@ -19,6 +19,10 @@ export class ReservationService {
     createReservationDto: CreateReservationDto,
     userId: number,
   ): Promise<Reservation> {
+    if (!userId) {
+      throw new BadRequestException('ID utilisateur manquant');
+    }
+
     const nouvelleDate = new Date(createReservationDto.dateHeure);
 
     const reservationsUtilisateur = await this.reservationRepo.find({
@@ -46,11 +50,11 @@ export class ReservationService {
       }
     }
 
-    const nouvelleReservation = this.reservationRepo.create({
-      movieId: createReservationDto.movieId,
-      dateHeure: nouvelleDate,
-      userId,
-    });
+    // Création de la réservation avec les données nécessaires
+    const nouvelleReservation = new Reservation();
+    nouvelleReservation.movieId = createReservationDto.movieId;
+    nouvelleReservation.dateHeure = nouvelleDate;
+    nouvelleReservation.userId = userId;
 
     return this.reservationRepo.save(nouvelleReservation);
   }

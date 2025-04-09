@@ -8,7 +8,8 @@ import {
 import { MoviesService } from './movies.service';
 import { MovieQueryDto } from './dto/movie-query.dto';
 import {
-  ApiBearerAuth, ApiBody,
+  ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiQuery,
   ApiResponse,
@@ -26,32 +27,15 @@ export class MoviesController {
   @ApiOperation({ summary: "Récupérer les films actuellement à l'affiche" })
   @ApiResponse({
     status: 200,
-    description: "Liste des films récupérés avec succès",
+    description: 'Liste des films récupérés avec succès',
   })
   @ApiResponse({
     status: 500,
     description: 'Erreur serveur : Impossible de récupérer les films',
   })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Numéro de page pour la pagination',
-  })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    description: 'Valeur de recherche pour filtrer les films',
-  })
-  @ApiQuery({
-    name: 'sort',
-    required: false,
-    type: String,
-    description: 'Critere de tri comme popularity.desc ou release_date.desc',
-  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @Get()
-  @ApiBody({type: MovieQueryDto})
   async getNowPlaying(
     @Query(new ValidationPipe({ transform: true })) query: MovieQueryDto,
   ): Promise<{

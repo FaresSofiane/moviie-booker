@@ -9,7 +9,6 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../user/entities/user.entity';
 
-
 @Injectable()
 export class AuthService {
   constructor(
