@@ -1,4 +1,3 @@
-// src/movies/dto/movie-query.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';

@@ -45,7 +45,9 @@ describe('MoviesController', () => {
         total_results: 100,
       };
 
-      jest.spyOn(moviesService, 'getNowPlaying').mockResolvedValue(expectedResult);
+      jest
+        .spyOn(moviesService, 'getNowPlaying')
+        .mockResolvedValue(expectedResult);
 
       // Act
       const result = await controller.getNowPlaying(queryParams);
@@ -66,7 +68,9 @@ describe('MoviesController', () => {
         total_results: 100,
       };
 
-      jest.spyOn(moviesService, 'getNowPlaying').mockResolvedValue(expectedResult);
+      jest
+        .spyOn(moviesService, 'getNowPlaying')
+        .mockResolvedValue(expectedResult);
 
       // Act
       const result = await controller.getNowPlaying(queryParams);
@@ -89,7 +93,9 @@ describe('MoviesController', () => {
         total_results: 50,
       };
 
-      jest.spyOn(moviesService, 'getNowPlaying').mockResolvedValue(expectedResult);
+      jest
+        .spyOn(moviesService, 'getNowPlaying')
+        .mockResolvedValue(expectedResult);
 
       // Act
       const result = await controller.getNowPlaying(queryParams);
@@ -112,7 +118,9 @@ describe('MoviesController', () => {
         total_results: 100,
       };
 
-      jest.spyOn(moviesService, 'getNowPlaying').mockResolvedValue(expectedResult);
+      jest
+        .spyOn(moviesService, 'getNowPlaying')
+        .mockResolvedValue(expectedResult);
 
       // Act
       const result = await controller.getNowPlaying(queryParams);
@@ -127,10 +135,14 @@ describe('MoviesController', () => {
       const queryParams = new MovieQueryDto();
       const expectedError = new Error('Service error');
 
-      jest.spyOn(moviesService, 'getNowPlaying').mockRejectedValue(expectedError);
+      jest
+        .spyOn(moviesService, 'getNowPlaying')
+        .mockRejectedValue(expectedError);
 
       // Act & Assert
-      await expect(controller.getNowPlaying(queryParams)).rejects.toThrow(expectedError);
+      await expect(controller.getNowPlaying(queryParams)).rejects.toThrow(
+        expectedError,
+      );
     });
   });
 });

@@ -45,5 +45,4 @@ export class UserController {
     const { password, ...userWithoutPassword } = req.user;
     return userWithoutPassword;
   }
-
 }

@@ -19,14 +19,12 @@ export class ReservationService {
     createReservationDto: CreateReservationDto,
     userId: number,
   ): Promise<Reservation> {
-    // Vérification que userId est défini
     if (!userId) {
       throw new BadRequestException('ID utilisateur manquant');
     }
 
     const nouvelleDate = new Date(createReservationDto.dateHeure);
 
-    // Vérification des conflits de réservation
     const reservationsUtilisateur = await this.reservationRepo.find({
       where: { userId },
     });
@@ -58,7 +56,6 @@ export class ReservationService {
     nouvelleReservation.dateHeure = nouvelleDate;
     nouvelleReservation.userId = userId;
 
-    // Sauvegarde de la réservation
     return this.reservationRepo.save(nouvelleReservation);
   }
 

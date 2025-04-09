@@ -8,7 +8,8 @@ import {
 import { MoviesService } from './movies.service';
 import { MovieQueryDto } from './dto/movie-query.dto';
 import {
-  ApiBearerAuth, ApiBody,
+  ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiQuery,
   ApiResponse,
@@ -26,7 +27,7 @@ export class MoviesController {
   @ApiOperation({ summary: "Récupérer les films actuellement à l'affiche" })
   @ApiResponse({
     status: 200,
-    description: "Liste des films récupérés avec succès",
+    description: 'Liste des films récupérés avec succès',
   })
   @ApiResponse({
     status: 500,
@@ -45,5 +46,4 @@ export class MoviesController {
   }> {
     return this.moviesService.getNowPlaying(query);
   }
-
 }

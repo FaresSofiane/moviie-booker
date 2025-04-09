@@ -111,7 +111,11 @@ describe('UserService', () => {
 
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedpassword');
 
-      const result = await service.create('testuser', 'test@example.com', 'password123');
+      const result = await service.create(
+        'testuser',
+        'test@example.com',
+        'password123',
+      );
 
       expect(result).toEqual(mockUser);
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({
@@ -135,7 +139,7 @@ describe('UserService', () => {
       mockUserRepository.findOne.mockResolvedValue(existingUser);
 
       await expect(
-        service.create('testuser', 'existing@example.com', 'password123')
+        service.create('testuser', 'existing@example.com', 'password123'),
       ).rejects.toThrow(ConflictException);
 
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({
@@ -157,19 +161,28 @@ describe('UserService', () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      const result = await service.validateUser('test@example.com', 'correctPassword');
+      const result = await service.validateUser(
+        'test@example.com',
+        'correctPassword',
+      );
 
       expect(result).toEqual(mockUser);
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({
         where: { email: 'test@example.com' },
       });
-      expect(bcrypt.compare).toHaveBeenCalledWith('correctPassword', 'hashedPassword');
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        'correctPassword',
+        'hashedPassword',
+      );
     });
 
     it('should return null when user does not exist', async () => {
       mockUserRepository.findOne.mockResolvedValue(null);
 
-      const result = await service.validateUser('nonexistent@example.com', 'anyPassword');
+      const result = await service.validateUser(
+        'nonexistent@example.com',
+        'anyPassword',
+      );
 
       expect(result).toBeNull();
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({
@@ -188,13 +201,19 @@ describe('UserService', () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      const result = await service.validateUser('test@example.com', 'wrongPassword');
+      const result = await service.validateUser(
+        'test@example.com',
+        'wrongPassword',
+      );
 
       expect(result).toBeNull();
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({
         where: { email: 'test@example.com' },
       });
-      expect(bcrypt.compare).toHaveBeenCalledWith('wrongPassword', 'hashedPassword');
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        'wrongPassword',
+        'hashedPassword',
+      );
     });
   });
 });

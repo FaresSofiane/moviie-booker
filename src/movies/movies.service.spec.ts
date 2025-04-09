@@ -142,7 +142,7 @@ describe('MoviesService', () => {
       const mockApiKey = 'test-api-key';
       const queryParams: MovieQueryDto = {
         page: 1,
-        sort: 'release_date.desc'
+        sort: 'release_date.desc',
       };
 
       const mockResponse: AxiosResponse = {
@@ -206,7 +206,9 @@ describe('MoviesService', () => {
         return null;
       });
 
-      jest.spyOn(httpService, 'get').mockReturnValue(throwError(() => errorResponse));
+      jest
+        .spyOn(httpService, 'get')
+        .mockReturnValue(throwError(() => errorResponse));
 
       // Act & Assert
       await expect(service.getNowPlaying(queryParams)).rejects.toThrowError(
@@ -232,7 +234,9 @@ describe('MoviesService', () => {
         return null;
       });
 
-      jest.spyOn(httpService, 'get').mockReturnValue(throwError(() => errorResponse));
+      jest
+        .spyOn(httpService, 'get')
+        .mockReturnValue(throwError(() => errorResponse));
 
       // Act & Assert
       await expect(service.getNowPlaying(queryParams)).rejects.toThrowError(
@@ -256,7 +260,9 @@ describe('MoviesService', () => {
         return null;
       });
 
-      jest.spyOn(httpService, 'get').mockReturnValue(throwError(() => errorResponse));
+      jest
+        .spyOn(httpService, 'get')
+        .mockReturnValue(throwError(() => errorResponse));
 
       // Act & Assert
       await expect(service.getNowPlaying(queryParams)).rejects.toThrowError(

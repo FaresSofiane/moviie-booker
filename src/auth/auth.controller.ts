@@ -1,5 +1,3 @@
-// src/auth/auth.controller.ts
-
 import {
   Body,
   Controller,
@@ -13,7 +11,13 @@ import {
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RegisterDto } from './dto/register.dto';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 
 @ApiTags('Authentification')
@@ -58,7 +62,6 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Récupérer le profil de l utilisateur' })
   getProfile(@Request() req) {
-
     console.log(req.user);
 
     return {
