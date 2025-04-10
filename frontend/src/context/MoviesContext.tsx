@@ -43,6 +43,7 @@ interface Movie {
     duration: number;
     posterUrl?: string;
     rating?: number;
+    overview?: string
 }
 
 

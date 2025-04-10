@@ -49,7 +49,7 @@ export const ReservationProvider: React.FC<ReservationProviderProps> = ({ childr
     const [error, setError] = useState<string | null>(null);
 
     // Récupération du contexte d'authentification
-    const { token, isLoading } = useAuth();
+    const { token } = useAuth();
 
     // Création de l'instance axios avec le token d'authentification
     const api = axios.create({
