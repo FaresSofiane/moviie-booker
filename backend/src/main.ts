@@ -35,6 +35,19 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT || 3000);
+
+  const serverUrl = `https://moviie-booker-glep.onrender.com/`;
+  setInterval(
+    async () => {
+      try {
+        await fetch(serverUrl);
+        console.log('Ping de maintien en activité effectué');
+      } catch (error) {
+        console.error('Erreur lors du ping de maintien en activité:', error);
+      }
+    },
+    14 * 60 * 1000,
+  );
 }
 
 bootstrap();
