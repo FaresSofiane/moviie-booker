@@ -23,6 +23,9 @@ import { ReservationModule } from './reservation/reservation.module';
       database: process.env.DATABASE_NAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
+      ssl: {
+        rejectUnauthorized: false, // Vous pouvez mettre à true si vous avez les certificats appropriés
+      },
     }),
     AuthModule,
     UserModule,
