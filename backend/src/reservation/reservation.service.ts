@@ -50,7 +50,6 @@ export class ReservationService {
       }
     }
 
-    // Création de la réservation avec les données nécessaires
     const nouvelleReservation = new Reservation();
     nouvelleReservation.movieId = createReservationDto.movieId;
     nouvelleReservation.dateHeure = nouvelleDate;

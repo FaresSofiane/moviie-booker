@@ -9,9 +9,7 @@ import { MoviesService } from './movies.service';
 import { MovieQueryDto } from './dto/movie-query.dto';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiOperation,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';

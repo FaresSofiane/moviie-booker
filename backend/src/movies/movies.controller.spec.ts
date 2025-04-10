@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MoviesController } from './movies.controller';
 import { MoviesService } from './movies.service';
 import { MovieQueryDto } from './dto/movie-query.dto';
-import { ValidationPipe } from '@nestjs/common';
 
 describe('MoviesController', () => {
   let controller: MoviesController;
@@ -31,7 +30,6 @@ describe('MoviesController', () => {
 
   describe('getNowPlaying', () => {
     it('should call moviesService.getNowPlaying with the provided query parameters', async () => {
-      // Arrange
       const queryParams: MovieQueryDto = {
         page: 2,
         search: 'Avengers',
@@ -49,16 +47,13 @@ describe('MoviesController', () => {
         .spyOn(moviesService, 'getNowPlaying')
         .mockResolvedValue(expectedResult);
 
-      // Act
       const result = await controller.getNowPlaying(queryParams);
 
-      // Assert
       expect(moviesService.getNowPlaying).toHaveBeenCalledWith(queryParams);
       expect(result).toEqual(expectedResult);
     });
 
     it('should pass default parameters when none are provided', async () => {
-      // Arrange
       const queryParams = new MovieQueryDto();
 
       const expectedResult = {
@@ -72,16 +67,13 @@ describe('MoviesController', () => {
         .spyOn(moviesService, 'getNowPlaying')
         .mockResolvedValue(expectedResult);
 
-      // Act
       const result = await controller.getNowPlaying(queryParams);
 
-      // Assert
       expect(moviesService.getNowPlaying).toHaveBeenCalledWith(queryParams);
       expect(result).toEqual(expectedResult);
     });
 
     it('should handle search parameter correctly', async () => {
-      // Arrange
       const queryParams: MovieQueryDto = {
         search: 'Star Wars',
       };
@@ -97,16 +89,13 @@ describe('MoviesController', () => {
         .spyOn(moviesService, 'getNowPlaying')
         .mockResolvedValue(expectedResult);
 
-      // Act
       const result = await controller.getNowPlaying(queryParams);
 
-      // Assert
       expect(moviesService.getNowPlaying).toHaveBeenCalledWith(queryParams);
       expect(result).toEqual(expectedResult);
     });
 
     it('should handle sort parameter correctly', async () => {
-      // Arrange
       const queryParams: MovieQueryDto = {
         sort: 'release_date.desc',
       };
@@ -122,16 +111,13 @@ describe('MoviesController', () => {
         .spyOn(moviesService, 'getNowPlaying')
         .mockResolvedValue(expectedResult);
 
-      // Act
       const result = await controller.getNowPlaying(queryParams);
 
-      // Assert
       expect(moviesService.getNowPlaying).toHaveBeenCalledWith(queryParams);
       expect(result).toEqual(expectedResult);
     });
 
     it('should propagate errors from the service', async () => {
-      // Arrange
       const queryParams = new MovieQueryDto();
       const expectedError = new Error('Service error');
 
@@ -139,7 +125,6 @@ describe('MoviesController', () => {
         .spyOn(moviesService, 'getNowPlaying')
         .mockRejectedValue(expectedError);
 
-      // Act & Assert
       await expect(controller.getNowPlaying(queryParams)).rejects.toThrow(
         expectedError,
       );

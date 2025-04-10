@@ -40,7 +40,6 @@ describe('ReservationService', () => {
 
   describe('creerReservation', () => {
     it('devrait créer une réservation avec succès', async () => {
-      // Arrange
       const userId = 1;
       const createReservationDto: CreateReservationDto = {
         movieId: 1,
@@ -56,13 +55,11 @@ describe('ReservationService', () => {
       mockReservationRepository.find.mockResolvedValue([]);
       mockReservationRepository.save.mockResolvedValue(mockReservation);
 
-      // Act
       const result = await service.creerReservation(
         createReservationDto,
         userId,
       );
 
-      // Assert
       expect(repository.find).toHaveBeenCalledWith({ where: { userId } });
       expect(repository.save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -75,23 +72,20 @@ describe('ReservationService', () => {
     });
 
     it('devrait rejeter si userId est manquant', async () => {
-      // Arrange
       const createReservationDto: CreateReservationDto = {
         movieId: 1,
         dateHeure: '2023-06-01T14:00:00',
       };
 
-      // Act & Assert
       await expect(
-        service.creerReservation(createReservationDto, 0), // Utiliser 0 au lieu de undefined
+        service.creerReservation(createReservationDto, 0),
       ).rejects.toThrow(BadRequestException);
       await expect(
-        service.creerReservation(createReservationDto, 0), // Utiliser 0 au lieu de undefined
+        service.creerReservation(createReservationDto, 0),
       ).rejects.toThrow('ID utilisateur manquant');
     });
 
     it('devrait rejeter en cas de conflit de réservation', async () => {
-      // Arrange
       const userId = 1;
       const createReservationDto: CreateReservationDto = {
         movieId: 1,
@@ -106,7 +100,6 @@ describe('ReservationService', () => {
 
       mockReservationRepository.find.mockResolvedValue([existingReservation]);
 
-      // Act & Assert
       await expect(
         service.creerReservation(createReservationDto, userId),
       ).rejects.toThrow(BadRequestException);
@@ -120,7 +113,6 @@ describe('ReservationService', () => {
 
   describe('getReservationsUtilisateur', () => {
     it("devrait retourner les réservations de l'utilisateur", async () => {
-      // Arrange
       const userId = 1;
       const mockReservations = [
         {
@@ -139,10 +131,8 @@ describe('ReservationService', () => {
 
       mockReservationRepository.find.mockResolvedValue(mockReservations);
 
-      // Act
       const result = await service.getReservationsUtilisateur(userId);
 
-      // Assert
       expect(repository.find).toHaveBeenCalledWith({
         where: { userId },
         order: { dateHeure: 'ASC' },
@@ -153,7 +143,6 @@ describe('ReservationService', () => {
 
   describe('annulerReservation', () => {
     it('devrait annuler une réservation avec succès', async () => {
-      // Arrange
       const reservationId = 1;
       const userId = 1;
 
@@ -166,10 +155,8 @@ describe('ReservationService', () => {
       mockReservationRepository.findOne.mockResolvedValue(mockReservation);
       mockReservationRepository.remove.mockResolvedValue(undefined);
 
-      // Act
       await service.annulerReservation(reservationId, userId);
 
-      // Assert
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: reservationId, userId },
       });
@@ -177,13 +164,11 @@ describe('ReservationService', () => {
     });
 
     it("devrait lancer une exception si la réservation n'est pas trouvée", async () => {
-      // Arrange
       const reservationId = 999;
       const userId = 1;
 
       mockReservationRepository.findOne.mockResolvedValue(null);
 
-      // Act & Assert
       await expect(
         service.annulerReservation(reservationId, userId),
       ).rejects.toThrow(NotFoundException);

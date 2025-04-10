@@ -22,7 +22,6 @@ export function ReservationsDialog() {
     const {movies} = useMovies();
 
 
-    // Fonction sécurisée pour trouver le titre du film
     const getMovieTitle = (movieId: number) => {
         console.log(movies);
         if (!Array.isArray(movies)) {

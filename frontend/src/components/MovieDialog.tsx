@@ -1,4 +1,3 @@
-// src/components/MovieDialog.tsx
 import React, { useEffect, useState } from 'react';
 import {
     Dialog,
@@ -12,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useReservations } from "@/context/ReservationContext";
 import { format } from "date-fns";
 import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css'; // Styles de base
+import 'react-calendar/dist/Calendar.css';
 
 interface MovieDialogProps {
     open: boolean;
@@ -30,29 +29,21 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
                                                      onOpenChange,
                                                      movie
                                                  }) => {
-    // Récupérer le contexte de réservation
     const { reservations, cancelReservation, createReservation, isLoading } = useReservations();
 
-    // État pour vérifier si une réservation existe déjà pour ce film
     const [existingReservation, setExistingReservation] = useState<number | null>(null);
 
-    // État pour l'affichage du dialogue de confirmation
     const [showConfirmation, setShowConfirmation] = useState(false);
 
-    // Date d'aujourd'hui (minimum pour la sélection)
     const today = new Date();
 
-    // Créneaux horaires disponibles
-    const timeSlots = ["10:00", "12:30", "14:00", "16:30", "18:00", "20:30"];
+    const timeSlots = ["10:00", "12:30", "14:00", "16:30", "18:00", "20:30", "22:30",];
 
-    // État pour stocker la date et l'heure sélectionnées
     const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(today);
     const [selectedTime, setSelectedTime] = React.useState<string | null>(null);
 
-    // Fonction pour gérer le changement de date
     const handleDateChange = (date: Date | Date[]) => {
-        // Si c'est un tableau, prenez la première date
-        // Si c'est une seule date, utilisez-la directement
+
         setSelectedDate(Array.isArray(date) ? date[0] : date);
     };
 
@@ -67,7 +58,6 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
         }
     }, [reservations, movie]);
 
-    // Gérer l'annulation de la réservation
     const handleCancelReservation = async () => {
         if (existingReservation) {
             try {
@@ -80,10 +70,8 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
         }
     };
 
-    // Gérer la création d'une nouvelle réservation
     const handleReservation = async () => {
         if (selectedDate && selectedTime) {
-            // Combinaison de la date et de l'heure
             const [hours, minutes] = selectedTime.split(':').map(Number);
             const reservationDate = new Date(selectedDate);
             reservationDate.setHours(hours, minutes);
@@ -93,7 +81,6 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
                     movieId: movie.id,
                     dateHeure: reservationDate.toISOString()
                 });
-                // Réinitialiser les sélections après succès
                 setSelectedTime(null);
                 onOpenChange(false);
             } catch (error) {
@@ -110,7 +97,6 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
                 </DialogHeader>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-                    {/* Affichage de l'image du film */}
                     <div className="flex flex-col space-y-4">
                         {movie.posterUrl && (
                             <div className="aspect-[2/3] w-full overflow-hidden rounded-lg">
@@ -122,7 +108,6 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
                             </div>
                         )}
 
-                        {/* Description du film */}
                         {movie.description && (
                             <div className="text-sm text-gray-600">
                                 {movie.description}
@@ -130,10 +115,8 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
                         )}
                     </div>
 
-                    {/* Section de réservation */}
                     <div className="flex flex-col space-y-4">
                         {existingReservation ? (
-                            /* Afficher la confirmation d'annulation si on a déjà réservé */
                             <>
                                 <div className="bg-green-50 text-green-700 p-4 rounded-md">
                                     <p className="font-medium">Vous avez déjà réservé ce film</p>
@@ -158,11 +141,9 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
                                 )}
                             </>
                         ) : (
-                            /* Afficher le formulaire de réservation */
                             <>
                                 <h3 className="text-lg font-semibold">Sélectionnez une date</h3>
 
-                                {/* Calendrier avec react-calendar */}
                                 <div className="my-4">
                                     <Calendar
                                         onChange={handleDateChange}
@@ -170,9 +151,7 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
                                         minDate={today}
                                         className="rounded-md border shadow-md p-2 bg-white w-full"
                                         tileClassName={({ date }) => {
-                                            // Date actuelle (pour comparaison)
                                             const currentDate = new Date();
-                                            // Si la date est dans le futur, elle est sélectionnable
                                             return date >= currentDate ?
                                                 'hover:bg-blue-200 rounded-md' :
                                                 'text-gray-400'
@@ -180,14 +159,12 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
                                     />
                                 </div>
 
-                                {/* Information sur la date sélectionnée */}
                                 {selectedDate && (
                                     <div className="text-sm font-medium text-blue-600">
                                         Date sélectionnée: {format(selectedDate, 'dd/MM/yyyy')}
                                     </div>
                                 )}
 
-                                {/* Sélection de l'horaire */}
                                 <div className="space-y-2">
                                     <h3 className="text-lg font-semibold">Choisissez un horaire</h3>
                                     <div className="grid grid-cols-3 gap-2">
@@ -207,7 +184,6 @@ const MovieDialog: React.FC<MovieDialogProps> = ({
                                     </div>
                                 </div>
 
-                                {/* Bouton de réservation */}
                                 <Button
                                     className="mt-4"
                                     onClick={handleReservation}

@@ -42,7 +42,6 @@ describe('MoviesService', () => {
 
   describe('getNowPlaying', () => {
     it('should return now playing movies when no search parameter is provided', async () => {
-      // Arrange
       const mockApiUrl = 'https://api.themoviedb.org/3';
       const mockApiKey = 'test-api-key';
       const queryParams: MovieQueryDto = { page: 1 };
@@ -68,10 +67,8 @@ describe('MoviesService', () => {
 
       jest.spyOn(httpService, 'get').mockReturnValue(of(mockResponse));
 
-      // Act
       const result = await service.getNowPlaying(queryParams);
 
-      // Assert
       expect(configService.get).toHaveBeenCalledWith('TMDB_API_URL');
       expect(configService.get).toHaveBeenCalledWith('TMDB_API_KEY');
       expect(httpService.get).toHaveBeenCalledWith(
@@ -90,7 +87,6 @@ describe('MoviesService', () => {
     });
 
     it('should use search/movie endpoint when search parameter is provided', async () => {
-      // Arrange
       const mockApiUrl = 'https://api.themoviedb.org/3';
       const mockApiKey = 'test-api-key';
       const queryParams: MovieQueryDto = { page: 1, search: 'Avengers' };
@@ -116,10 +112,8 @@ describe('MoviesService', () => {
 
       jest.spyOn(httpService, 'get').mockReturnValue(of(mockResponse));
 
-      // Act
       const result = await service.getNowPlaying(queryParams);
 
-      // Assert
       expect(httpService.get).toHaveBeenCalledWith(
         `${mockApiUrl}/search/movie`,
         {
@@ -137,7 +131,6 @@ describe('MoviesService', () => {
     });
 
     it('should include sort parameter when provided', async () => {
-      // Arrange
       const mockApiUrl = 'https://api.themoviedb.org/3';
       const mockApiKey = 'test-api-key';
       const queryParams: MovieQueryDto = {
@@ -166,10 +159,8 @@ describe('MoviesService', () => {
 
       jest.spyOn(httpService, 'get').mockReturnValue(of(mockResponse));
 
-      // Act
       const result = await service.getNowPlaying(queryParams);
 
-      // Assert
       expect(httpService.get).toHaveBeenCalledWith(
         `${mockApiUrl}/movie/now_playing`,
         {
@@ -187,7 +178,6 @@ describe('MoviesService', () => {
     });
 
     it('should throw HttpException when API call fails', async () => {
-      // Arrange
       const mockApiUrl = 'https://api.themoviedb.org/3';
       const mockApiKey = 'test-api-key';
       const queryParams: MovieQueryDto = { page: 1 };
@@ -210,14 +200,12 @@ describe('MoviesService', () => {
         .spyOn(httpService, 'get')
         .mockReturnValue(throwError(() => errorResponse));
 
-      // Act & Assert
       await expect(service.getNowPlaying(queryParams)).rejects.toThrowError(
         new HttpException('Invalid API key', 401),
       );
     });
 
     it('should use default error message when API error has no status_message', async () => {
-      // Arrange
       const mockApiUrl = 'https://api.themoviedb.org/3';
       const mockApiKey = 'test-api-key';
       const queryParams: MovieQueryDto = { page: 1 };
@@ -238,7 +226,6 @@ describe('MoviesService', () => {
         .spyOn(httpService, 'get')
         .mockReturnValue(throwError(() => errorResponse));
 
-      // Act & Assert
       await expect(service.getNowPlaying(queryParams)).rejects.toThrowError(
         new HttpException(
           'Une erreur est survenue lors de la récupération des films',
@@ -248,7 +235,6 @@ describe('MoviesService', () => {
     });
 
     it('should use INTERNAL_SERVER_ERROR when no status code in error', async () => {
-      // Arrange
       const mockApiUrl = 'https://api.themoviedb.org/3';
       const mockApiKey = 'test-api-key';
       const queryParams: MovieQueryDto = { page: 1 };
@@ -264,7 +250,6 @@ describe('MoviesService', () => {
         .spyOn(httpService, 'get')
         .mockReturnValue(throwError(() => errorResponse));
 
-      // Act & Assert
       await expect(service.getNowPlaying(queryParams)).rejects.toThrowError(
         new HttpException(
           'Une erreur est survenue lors de la récupération des films',

@@ -1,4 +1,3 @@
-// src/components/MovieList.tsx
 import React, { useEffect } from 'react';
 import { useMovies } from '@/context/MoviesContext';
 import MovieCard from '@/components/MovieCard';
@@ -7,7 +6,6 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 const MovieList: React.FC = () => {
     const { movies, isLoading, error, fetchMovies } = useMovies();
 
-    // Option 2: charger uniquement si nécessaire
     useEffect(() => {
         if ((!movies || !movies || movies.length === 0) && !isLoading && !error) {
             fetchMovies().catch(err => {

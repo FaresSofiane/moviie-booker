@@ -24,7 +24,7 @@ import { ReservationModule } from './reservation/reservation.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
       ssl: {
-        rejectUnauthorized: false, // Vous pouvez mettre à true si vous avez les certificats appropriés
+        rejectUnauthorized: false,
       },
     }),
     AuthModule,

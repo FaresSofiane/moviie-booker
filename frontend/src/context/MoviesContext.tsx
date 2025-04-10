@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import axios from 'axios';
 import { useAuth } from './AuthContext';
 
-// Interface pour la réponse API
 interface MovieAPIResponse {
     dates: {
         maximum: string;
@@ -14,7 +13,6 @@ interface MovieAPIResponse {
     total_results: number;
 }
 
-// Interface pour les films tels que reçus de l'API
 interface MovieAPI {
     id: number;
     title: string;
@@ -32,7 +30,6 @@ interface MovieAPI {
     vote_count: number;
 }
 
-// Définition de l'interface Movie pour notre application
 interface Movie {
     id: number;
     title: string;
@@ -47,7 +44,6 @@ interface Movie {
 }
 
 
-// Interface pour le contexte des films
 interface MoviesContextType {
     movies: Movie[];
     isLoading: boolean;
@@ -72,15 +68,12 @@ export const useMovies = (): MoviesContextType => {
 };
 
 export const MoviesProvider: React.FC<MoviesProviderProps> = ({ children }) => {
-    // États
     const [movies, setMovies] = useState<Movie[]>([]);
     const [isLoadingMovie, setIsLoadingMovie] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Récupération du contexte d'authentification
     const { token, isLoading } = useAuth();
 
-    // Création de l'instance axios
     const api = axios.create({
         baseURL: API_URL,
         headers: {
@@ -89,9 +82,6 @@ export const MoviesProvider: React.FC<MoviesProviderProps> = ({ children }) => {
         },
     });
 
-    // Mise à jour de l'intercepteur lors des changements de token
-
-    // Récupération de tous les films
     const fetchMovies = async (): Promise<void> => {
         setIsLoadingMovie(true);
         setError(null);
@@ -99,16 +89,14 @@ export const MoviesProvider: React.FC<MoviesProviderProps> = ({ children }) => {
         try {
             const response = await api.get<MovieAPIResponse>('/movies');
 
-            // Transformer les données de l'API en notre format Movie
             const transformedMovies: Movie[] = response.data.results.map(movieData => ({
                 id: movieData.id,
                 title: movieData.title,
                 description: movieData.overview,
                 releaseDate: new Date(movieData.release_date),
-                // Vous devrez peut-être mapper les genre_ids vers des noms de genres
-                genre: movieData.genre_ids.join(', '), // Temporaire, à améliorer
-                director: 'Non disponible', // Cette donnée n'est pas présente dans l'API
-                duration: 0, // Cette donnée n'est pas présente dans l'API
+                genre: movieData.genre_ids.join(', '),
+                director: 'Non disponible',
+                duration: 0,
                 posterUrl: movieData.poster_path ? `https://image.tmdb.org/t/p/w500${movieData.poster_path}` : undefined,
                 rating: movieData.vote_average,
             }));
@@ -127,12 +115,10 @@ export const MoviesProvider: React.FC<MoviesProviderProps> = ({ children }) => {
         }
     };
 
-    // Chargement initial des données
     useEffect(() => {
         fetchMovies();
     }, [isLoading]);
 
-    // Valeur du contexte
     const contextValue: MoviesContextType = {
         movies,
         isLoading: isLoadingMovie,

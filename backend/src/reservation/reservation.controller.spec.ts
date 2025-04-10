@@ -35,7 +35,6 @@ describe('ReservationController', () => {
 
   describe('creer', () => {
     it('devrait créer une nouvelle réservation', async () => {
-      // Arrange
       const createReservationDto: CreateReservationDto = {
         movieId: 1,
         dateHeure: '2023-06-01T14:00:00',
@@ -53,10 +52,8 @@ describe('ReservationController', () => {
         mockReservation,
       );
 
-      // Act
       const result = await controller.creer(createReservationDto, mockRequest);
 
-      // Assert
       expect(service.creerReservation).toHaveBeenCalledWith(
         createReservationDto,
         userId,
@@ -67,7 +64,6 @@ describe('ReservationController', () => {
 
   describe('getMesReservations', () => {
     it("devrait retourner les réservations de l'utilisateur", async () => {
-      // Arrange
       const userId = 1;
       const mockReservations = [
         {
@@ -89,10 +85,8 @@ describe('ReservationController', () => {
         mockReservations,
       );
 
-      // Act
       const result = await controller.getMesReservations(mockRequest);
 
-      // Assert
       expect(service.getReservationsUtilisateur).toHaveBeenCalledWith(userId);
       expect(result).toEqual(mockReservations);
     });
@@ -100,17 +94,14 @@ describe('ReservationController', () => {
 
   describe('annuler', () => {
     it('devrait annuler une réservation avec succès', async () => {
-      // Arrange
       const reservationId = '1';
       const userId = 1;
       const mockRequest = { user: { userId } };
 
       mockReservationService.annulerReservation.mockResolvedValue(undefined);
 
-      // Act
       const result = await controller.annuler(reservationId, mockRequest);
 
-      // Assert
       expect(service.annulerReservation).toHaveBeenCalledWith(
         +reservationId,
         userId,
@@ -119,7 +110,6 @@ describe('ReservationController', () => {
     });
 
     it("devrait lancer une exception si la réservation n'est pas trouvée", async () => {
-      // Arrange
       const reservationId = '999';
       const userId = 1;
       const mockRequest = { user: { userId } };
@@ -128,7 +118,6 @@ describe('ReservationController', () => {
         new NotFoundException('Réservation introuvable'),
       );
 
-      // Act & Assert
       await expect(
         controller.annuler(reservationId, mockRequest),
       ).rejects.toThrow(NotFoundException);

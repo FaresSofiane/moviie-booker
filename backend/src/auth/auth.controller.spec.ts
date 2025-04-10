@@ -9,7 +9,6 @@ describe('AuthController', () => {
   let controller: AuthController;
   let authService: AuthService;
 
-  // Mock du service d'authentification
   const mockAuthService = {
     register: jest.fn(),
     login: jest.fn(),
@@ -39,7 +38,6 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it("devrait appeler authService.register avec les données d'inscription", async () => {
-      // Arrangement
       const registerDto: RegisterDto = {
         username: 'testuser',
         email: 'test@example.com',
@@ -52,10 +50,8 @@ describe('AuthController', () => {
       };
       mockAuthService.register.mockResolvedValue(expectedResult);
 
-      // Action
       const result = await controller.register(registerDto);
 
-      // Assertion
       expect(authService.register).toHaveBeenCalledWith(registerDto);
       expect(result).toEqual(expectedResult);
     });
@@ -63,7 +59,6 @@ describe('AuthController', () => {
 
   describe('login', () => {
     it("devrait appeler authService.login avec les informations d'identification", async () => {
-      // Arrangement
       const loginDto: LoginDto = {
         email: 'test@example.com',
         password: 'Password123!',
@@ -78,10 +73,8 @@ describe('AuthController', () => {
       };
       mockAuthService.login.mockResolvedValue(expectedResult);
 
-      // Action
       const result = await controller.login(loginDto);
 
-      // Assertion
       expect(authService.login).toHaveBeenCalledWith(loginDto);
       expect(result).toEqual(expectedResult);
     });
@@ -89,7 +82,6 @@ describe('AuthController', () => {
 
   describe('getProfile', () => {
     it("devrait retourner les informations de profil de l'utilisateur depuis la requête", () => {
-      // Arrangement
       const req = {
         user: {
           id: 1,
@@ -98,10 +90,8 @@ describe('AuthController', () => {
         },
       };
 
-      // Action
       const result = controller.getProfile(req);
 
-      // Assertion
       expect(result).toEqual({
         id: 1,
         email: 'test@example.com',
